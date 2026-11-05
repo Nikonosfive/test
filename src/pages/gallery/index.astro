@@ -1,0 +1,26 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import Carousel from '@/components/Carousel.astro';
+import { galleryItems } from '@/data/gallery';
+import { sitePath } from '@/utils/paths';
+---
+<SiteLayout title="ギャラリー" description="写真や作品を一覧できるギャラリーページです。" breadcrumbs={[{ label: 'ギャラリー' }]}>
+  <header class="page-intro page-shell">
+    <p class="eyebrow">GALLERY / SELECTED IMAGES</p>
+    <h1>ギャラリー</h1>
+    <p>写真、作品、視覚的な記録をまとめるページです。画像は public/images/gallery/ に追加し、src/data/gallery.ts に登録してください。</p>
+  </header>
+  <section class="page-shell section-block gallery-page">
+    <Carousel items={galleryItems} label="ギャラリーの画像" />
+    <div class="gallery-grid">
+      {galleryItems.map((item, index) => (
+        <figure class="gallery-card">
+          <a href={sitePath(item.image)} target="_blank" rel="noopener noreferrer" aria-label={`${item.title}の画像を開く`}>
+            <img src={sitePath(item.image)} alt={item.alt} loading="lazy" width="720" height="480" />
+          </a>
+          <figcaption><span class="gallery-index">{String(index + 1).padStart(2, '0')}</span><strong>{item.title}</strong><p>{item.description}</p></figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+</SiteLayout>

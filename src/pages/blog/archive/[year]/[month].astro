@@ -1,0 +1,40 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import BlogSidebar from '@/components/BlogSidebar.astro';
+import { getCollection } from 'astro:content';
+import { sitePath } from '@/utils/paths';
+
+const allPosts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const unique = new Map<string, { year: string; month: string }>();
+  for (const post of posts) {
+    const year = String(post.data.pubDate.getFullYear());
+    const month = String(post.data.pubDate.getMonth() + 1).padStart(2, '0');
+    unique.set(`${year}/${month}`, { year, month });
+  }
+  return [...unique.values()].map((params) => ({ params }));
+}
+const { year, month } = Astro.params;
+const posts = allPosts.filter((post) => post.data.pubDate.getFullYear() === Number(year) && post.data.pubDate.getMonth() + 1 === Number(month));
+const archiveMap = new Map<string, { year: number; month: number; count: number }>();
+const categoryMap = new Map<string, { name: string; slug: string; count: number }>();
+for (const post of allPosts) {
+  const y = post.data.pubDate.getFullYear(); const m = post.data.pubDate.getMonth() + 1; const k = `${y}-${m}`;
+  const ar = archiveMap.get(k); archiveMap.set(k, { year: y, month: m, count: (ar?.count ?? 0) + 1 });
+  const ca = categoryMap.get(post.data.categorySlug); categoryMap.set(post.data.categorySlug, { name: post.data.category, slug: post.data.categorySlug, count: (ca?.count ?? 0) + 1 });
+}
+const archives = [...archiveMap.values()].sort((a, b) => b.year - a.year || b.month - a.month);
+const categories = [...categoryMap.values()].sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+---
+<SiteLayout title={`${year}年${Number(month)}月の記事`} description={`${year}年${Number(month)}月に公開した記事一覧です。`} breadcrumbs={[{ label: 'ブログ', href: '/blog/' }, { label: '年月別', href: '/blog/' }, { label: `${year}.${month}` }]}>
+  <div class="page-intro page-shell"><p class="eyebrow">ARCHIVE</p><h1>{year}.{month}</h1><p>{posts.length}件の記事</p></div>
+  <div class="blog-layout page-shell">
+    <section class="blog-main">
+      <div class="post-list post-list-large">
+        {posts.map((post) => <article class="post-list-item"><a class="post-row" href={sitePath(`/blog/${post.id}/`)}><time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString('ja-JP')}</time><span class="post-row-title">{post.data.title}</span><span class="post-category">{post.data.category}</span><span class="row-arrow">↗</span></a><p>{post.data.description}</p></article>)}
+      </div>
+    </section>
+    <BlogSidebar archives={archives} categories={categories} />
+  </div>
+</SiteLayout>

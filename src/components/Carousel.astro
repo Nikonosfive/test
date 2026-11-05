@@ -1,0 +1,33 @@
+---
+interface Slide { title: string; description?: string; image: string; alt: string }
+const { items = [], label = '画像カルーセル' } = Astro.props as { items: Slide[]; label?: string };
+import { sitePath } from '@/utils/paths';
+---
+<section class="carousel-block" data-carousel aria-label={label}>
+  <div class="carousel-controls">
+    <span class="eyebrow">SELECTED IMAGES</span>
+    <div class="carousel-arrows">
+      <button type="button" data-carousel-prev aria-label="前の画像">←</button>
+      <button type="button" data-carousel-next aria-label="次の画像">→</button>
+    </div>
+  </div>
+  <div class="carousel-track" data-carousel-track tabindex="0">
+    {items.map((item) => (
+      <figure class="carousel-slide">
+        <img src={sitePath(item.image)} alt={item.alt} loading="lazy" width="720" height="480" />
+        <figcaption><strong>{item.title}</strong>{item.description && <span>{item.description}</span>}</figcaption>
+      </figure>
+    ))}
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((carousel) => {
+    const track = carousel.querySelector<HTMLElement>('[data-carousel-track]');
+    const previous = carousel.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+    const next = carousel.querySelector<HTMLButtonElement>('[data-carousel-next]');
+    const step = () => track?.querySelector<HTMLElement>('.carousel-slide')?.getBoundingClientRect().width ?? 320;
+    previous?.addEventListener('click', () => track?.scrollBy({ left: -step() - 20, behavior: 'smooth' }));
+    next?.addEventListener('click', () => track?.scrollBy({ left: step() + 20, behavior: 'smooth' }));
+  });
+</script>

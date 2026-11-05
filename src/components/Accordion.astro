@@ -1,0 +1,11 @@
+---
+const { items = [] } = Astro.props as { items: { title: string; content: string }[] };
+---
+<div class="accordion-list">
+  {items.map((item, index) => (
+    <details class="accordion-item" open={index === 0 ? undefined : false}>
+      <summary><span>{item.title}</span><span class="accordion-mark" aria-hidden="true">＋</span></summary>
+      <div class="accordion-content"><p>{item.content}</p></div>
+    </details>
+  ))}
+</div>

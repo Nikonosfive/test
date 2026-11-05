@@ -1,0 +1,56 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import LinkButton from '@/components/LinkButton.astro';
+import ImageLink from '@/components/ImageLink.astro';
+import Carousel from '@/components/Carousel.astro';
+import SocialLinks from '@/components/SocialLinks.astro';
+import { galleryItems } from '@/data/gallery';
+import { siteConfig } from '@/config/site';
+import { getCollection } from 'astro:content';
+import { sitePath } from '@/utils/paths';
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+---
+<SiteLayout title="ホーム" description={siteConfig.description} breadcrumbs={[{ label: 'ホーム' }]}>
+  <section class="home-hero page-shell">
+    <p class="eyebrow">{siteConfig.tagline}</p>
+    <h1>日々の断片を、<br />静かに残す。</h1>
+    <p class="hero-description">写真、文章、記録。<br />ここに、この場所についての短い紹介文を掲載します。</p>
+    <LinkButton href="/page/" label="このサイトについて" />
+    <span class="hero-index">EST. 2026　/　PERSONAL ARCHIVE</span>
+  </section>
+
+  <section class="section-block page-shell">
+    <div class="section-heading"><div><p class="eyebrow">EXPLORE</p><h2>コンテンツ</h2></div><span class="section-number">01 — 03</span></div>
+    <div class="feature-grid">
+      <ImageLink href="/gallery/" image="images/gallery/sample-01.svg" alt="ギャラリーのイメージ" title="Gallery" description="写真と視覚的な記録" />
+      <ImageLink href="/blog/" image="images/gallery/sample-02.svg" alt="ブログのイメージ" title="Journal" description="日々の出来事と思考" />
+      <ImageLink href="/page/" image="images/gallery/sample-03.svg" alt="このサイトについてのイメージ" title="About" description="この場所について" />
+    </div>
+  </section>
+
+  <section class="section-block page-shell">
+    <div class="section-heading"><div><p class="eyebrow">LATEST STORIES</p><h2>最近の記事</h2></div><LinkButton href="/blog/" label="記事一覧" /></div>
+    {posts.length > 0 ? (
+      <div class="post-list">
+        {posts.map((post) => (
+          <a class="post-row" href={sitePath(`/blog/${post.id}/`)}>
+            <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString('ja-JP')}</time>
+            <span class="post-row-title">{post.data.title}</span>
+            <span class="post-category">{post.data.category}</span>
+            <span class="row-arrow" aria-hidden="true">↗</span>
+          </a>
+        ))}
+      </div>
+    ) : <p class="muted">記事はまだありません。</p>}
+  </section>
+
+  <section class="section-block page-shell">
+    <div class="section-heading"><div><p class="eyebrow">SELECTED WORKS</p><h2>写真の一部</h2></div><LinkButton href="/gallery/" label="ギャラリーへ" /></div>
+    <Carousel items={galleryItems} />
+  </section>
+
+  <section class="section-block page-shell contact-strip">
+    <div><p class="eyebrow">ELSEWHERE</p><h2>外部リンク</h2></div>
+    <SocialLinks />
+  </section>
+</SiteLayout>

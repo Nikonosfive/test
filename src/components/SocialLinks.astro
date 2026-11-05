@@ -1,0 +1,9 @@
+---
+import { siteConfig } from '@/config/site';
+const links = Object.entries(siteConfig.social).filter(([, url]) => Boolean(url));
+---
+{links.length > 0 && (
+  <nav class="social-links" aria-label="ソーシャルメディア">
+    {links.map(([name, url]) => <a href={url} target="_blank" rel="noopener noreferrer">{name}<span aria-hidden="true">↗</span></a>)}
+  </nav>
+)}

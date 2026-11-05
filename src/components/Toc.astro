@@ -1,0 +1,10 @@
+---
+interface TocItem { id: string; label: string }
+const { items = [], title = '目次' } = Astro.props as { items: TocItem[]; title?: string };
+---
+{items.length > 0 && (
+  <nav class="toc" aria-label={title}>
+    <p class="toc-title">{title}</p>
+    <ol>{items.map((item) => <li><a href={`#${item.id}`}>{item.label}</a></li>)}</ol>
+  </nav>
+)}

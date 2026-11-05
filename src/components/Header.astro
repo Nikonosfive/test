@@ -1,0 +1,70 @@
+---
+import { siteConfig } from '@/config/site';
+import { sitePath } from '@/utils/paths';
+const base = import.meta.env.BASE_URL;
+---
+<header class="site-header" data-pagefind-ignore>
+  <div class="header-inner">
+    <a class="site-brand" href={sitePath('/')} aria-label={`${siteConfig.name} ホーム`}>
+      <span class="brand-name">{siteConfig.name}</span>
+      <span class="brand-caption">{siteConfig.tagline}</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="メインナビゲーション">
+      {siteConfig.navigation.map((item) => (
+        <a href={sitePath(item.href)}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="header-tools">
+      <div class="header-search" aria-label="サイト内検索">
+        <pagefind-searchbox placeholder="サイト内を検索" debounce-time="200"></pagefind-searchbox>
+      </div>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="ダークモードに切り替え" title="テーマを切り替え">
+        <span data-theme-icon aria-hidden="true">◐</span>
+      </button>
+      <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-navigation" aria-label="メニューを開く">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-navigation" data-mobile-menu hidden aria-label="モバイルナビゲーション">
+    {siteConfig.navigation.map((item) => (
+      <a href={sitePath(item.href)}>{item.label}</a>
+    ))}
+    <div class="mobile-search">
+      <pagefind-searchbox placeholder="サイト内を検索"></pagefind-searchbox>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const themeButton = document.querySelector('[data-theme-toggle]');
+  const themeIcon = document.querySelector('[data-theme-icon]');
+  const menuButton = document.querySelector('[data-menu-toggle]');
+  const mobileMenu = document.querySelector('[data-mobile-menu]');
+
+  const setTheme = (theme: string) => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('site-theme', theme);
+    themeButton?.setAttribute('aria-label', theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え');
+    if (themeIcon) themeIcon.textContent = theme === 'dark' ? '☼' : '◐';
+  };
+
+  const savedTheme = localStorage.getItem('site-theme');
+  if (savedTheme === 'dark' || savedTheme === 'light') setTheme(savedTheme);
+  else if (themeIcon) themeIcon.textContent = document.documentElement.dataset.theme === 'dark' ? '☼' : '◐';
+
+  themeButton?.addEventListener('click', () => {
+    const current = document.documentElement.dataset.theme || 'light';
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  menuButton?.addEventListener('click', () => {
+    const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!isOpen));
+    menuButton.setAttribute('aria-label', isOpen ? 'メニューを開く' : 'メニューを閉じる');
+    if (mobileMenu) mobileMenu.hidden = isOpen;
+  });
+</script>

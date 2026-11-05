@@ -1,0 +1,11 @@
+---
+const { href, image, alt, title, description = '' } = Astro.props as {
+  href: string; image: string; alt: string; title: string; description?: string;
+};
+import { sitePath } from '@/utils/paths';
+---
+<a class="image-link-card" href={sitePath(href)}>
+  <span class="image-link-media"><img src={sitePath(image)} alt={alt} loading="lazy" width="720" height="480" /></span>
+  <span class="image-link-copy"><strong>{title}</strong>{description && <span>{description}</span>}</span>
+  <span class="link-arrow" aria-hidden="true">↗</span>
+</a>

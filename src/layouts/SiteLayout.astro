@@ -1,0 +1,80 @@
+---
+import Header from '@/components/Header.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import { siteConfig } from '@/config/site';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  breadcrumbs?: { label: string; href?: string }[];
+  noIndex?: boolean;
+  ogImage?: string;
+}
+const { title, description = siteConfig.description, breadcrumbs = [], noIndex = false, ogImage } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const canonical = new URL(`${base}${Astro.url.pathname.replace(/^\/+/, '')}`, Astro.site);
+const imageUrl = new URL(ogImage ?? `${base}images/og-default.svg`, Astro.site);
+const homeUrl = new URL(base, Astro.site);
+const pageTitle = `${title} | ${siteConfig.name}`;
+---
+<!doctype html>
+<html lang="ja" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+    {import.meta.env.PROD && <link rel="stylesheet" href={`${base}pagefind/pagefind-component-ui.css`} />}
+    <script is:inline>
+      (() => {
+        try {
+          const saved = localStorage.getItem('site-theme');
+          const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          document.documentElement.dataset.theme = saved || preferred;
+        } catch { document.documentElement.dataset.theme = 'light'; }
+      })();
+    </script>
+    {import.meta.env.PROD && <script is:inline src={`${base}pagefind/pagefind-component-ui.js`} type="module"></script>}
+    <slot name="head" />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: siteConfig.name,
+      url: homeUrl,
+      inLanguage: 'ja',
+    })} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">本文へスキップ</a>
+    <pagefind-config base-url={base}></pagefind-config>
+    <Header />
+    <Breadcrumbs items={breadcrumbs} />
+    <main id="main-content"><slot /></main>
+    <footer class="site-footer" data-pagefind-ignore>
+      <div class="footer-inner">
+        <a class="footer-brand" href={`${base}`}>
+          <span>{siteConfig.name}</span><small>{siteConfig.tagline}</small>
+        </a>
+        <p>© {new Date().getFullYear()} {siteConfig.author}</p>
+      </div>
+    </footer>
+  </body>
+</html>

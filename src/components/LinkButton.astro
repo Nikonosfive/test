@@ -1,0 +1,10 @@
+---
+const { href, label, external = false } = Astro.props as {
+  href: string; label: string; external?: boolean;
+};
+import { sitePath } from '@/utils/paths';
+const target = external ? href : sitePath(href);
+---
+<a class="text-link-button" href={target} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
+  <span>{label}</span><span class="link-arrow" aria-hidden="true">↗</span>
+</a>

@@ -1,0 +1,48 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import BlogSidebar from '@/components/BlogSidebar.astro';
+import { getCollection } from 'astro:content';
+import { sitePath } from '@/utils/paths';
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const archiveMap = new Map<string, { year: number; month: number; count: number }>();
+const categoryMap = new Map<string, { name: string; slug: string; count: number }>();
+for (const post of posts) {
+  const y = post.data.pubDate.getFullYear();
+  const m = post.data.pubDate.getMonth() + 1;
+  const key = `${y}-${m}`;
+  const currentArchive = archiveMap.get(key);
+  archiveMap.set(key, { year: y, month: m, count: (currentArchive?.count ?? 0) + 1 });
+  const currentCategory = categoryMap.get(post.data.categorySlug);
+  categoryMap.set(post.data.categorySlug, { name: post.data.category, slug: post.data.categorySlug, count: (currentCategory?.count ?? 0) + 1 });
+}
+const archives = [...archiveMap.values()].sort((a, b) => b.year - a.year || b.month - a.month);
+const categories = [...categoryMap.values()].sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+---
+<SiteLayout title="ブログ" description="日々の記録や考えたことを綴るブログです。" breadcrumbs={[{ label: 'ブログ' }]}>
+  <header class="page-intro page-shell">
+    <p class="eyebrow">JOURNAL / ALL POSTS</p>
+    <h1>ブログ</h1>
+    <p>日々の記録、考えたこと、制作の記録など。</p>
+  </header>
+  <div class="blog-layout page-shell">
+    <section class="blog-main" aria-label="記事一覧">
+      <p class="result-count">{posts.length} ARTICLES</p>
+      {posts.length > 0 ? (
+        <div class="post-list post-list-large">
+          {posts.map((post) => (
+            <article class="post-list-item">
+              <a class="post-row" href={sitePath(`/blog/${post.id}/`)}>
+                <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString('ja-JP')}</time>
+                <span class="post-row-title">{post.data.title}</span>
+                <span class="post-category">{post.data.category}</span>
+                <span class="row-arrow" aria-hidden="true">↗</span>
+              </a>
+              <p>{post.data.description}</p>
+            </article>
+          ))}
+        </div>
+      ) : <p class="muted">記事はまだありません。</p>}
+    </section>
+    <BlogSidebar archives={archives} categories={categories} />
+  </div>
+</SiteLayout>

@@ -1,0 +1,25 @@
+---
+interface Archive { year: number; month: number; count: number }
+interface Category { name: string; slug: string; count: number }
+const { archives = [], categories = [] } = Astro.props as { archives: Archive[]; categories: Category[] };
+import { sitePath } from '@/utils/paths';
+---
+<aside class="blog-sidebar" aria-label="ブログの索引" data-pagefind-ignore>
+  <section>
+    <h2>ARCHIVE <span>年月別</span></h2>
+    <ul class="sidebar-list">
+      {archives.map((item) => (
+        <li><a href={sitePath(`/blog/archive/${item.year}/${String(item.month).padStart(2, '0')}/`)}><span>{item.year}.{String(item.month).padStart(2, '0')}</span><small>{item.count}</small></a></li>
+      ))}
+    </ul>
+  </section>
+  <section>
+    <h2>CATEGORY <span>カテゴリ別</span></h2>
+    <ul class="sidebar-list">
+      {categories.map((item) => (
+        <li><a href={sitePath(`/blog/category/${item.slug}/`)}><span>{item.name}</span><small>{item.count}</small></a></li>
+      ))}
+    </ul>
+  </section>
+  <a class="sidebar-all" href={sitePath('/blog/')}>すべての記事を見る ↗</a>
+</aside>

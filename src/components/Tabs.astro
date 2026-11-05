@@ -1,0 +1,44 @@
+---
+interface Tab { id: string; label: string; content: string }
+const { tabs = [] } = Astro.props as { tabs: Tab[] };
+---
+{tabs.length > 0 && (
+  <section class="tabs" data-tabs>
+    <div class="tab-list" role="tablist" aria-label="コンテンツ切り替え">
+      {tabs.map((tab, index) => (
+        <button type="button" role="tab" id={`tab-${tab.id}`} aria-controls={`panel-${tab.id}`} aria-selected={index === 0 ? 'true' : 'false'} tabindex={index === 0 ? 0 : -1} data-tab-trigger={tab.id}>{tab.label}</button>
+      ))}
+    </div>
+    {tabs.map((tab, index) => (
+      <div class="tab-panel" role="tabpanel" id={`panel-${tab.id}`} aria-labelledby={`tab-${tab.id}`} data-tab-panel={tab.id} hidden={index !== 0}>
+        <p>{tab.content}</p>
+      </div>
+    ))}
+  </section>
+)}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+    const triggers = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab-trigger]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-tab-panel]'));
+    const activate = (id: string) => {
+      triggers.forEach((button) => {
+        const active = button.dataset.tabTrigger === id;
+        button.setAttribute('aria-selected', String(active));
+        button.tabIndex = active ? 0 : -1;
+      });
+      panels.forEach((panel) => { panel.hidden = panel.dataset.tabPanel !== id; });
+    };
+    triggers.forEach((button, index) => {
+      button.addEventListener('click', () => activate(button.dataset.tabTrigger ?? ''));
+      button.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+        event.preventDefault();
+        const offset = event.key === 'ArrowRight' ? 1 : -1;
+        const next = triggers[(index + offset + triggers.length) % triggers.length];
+        next?.focus();
+        if (next?.dataset.tabTrigger) activate(next.dataset.tabTrigger);
+      });
+    });
+  });
+</script>

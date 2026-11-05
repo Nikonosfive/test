@@ -1,0 +1,65 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import LinkButton from '@/components/LinkButton.astro';
+import ImageLink from '@/components/ImageLink.astro';
+import Carousel from '@/components/Carousel.astro';
+import Toc from '@/components/Toc.astro';
+import SocialLinks from '@/components/SocialLinks.astro';
+import Accordion from '@/components/Accordion.astro';
+import Tabs from '@/components/Tabs.astro';
+import { galleryItems } from '@/data/gallery';
+const tocItems = [
+  { id: 'text-links', label: 'テキストリンク' },
+  { id: 'image-links', label: '画像付きリンク' },
+  { id: 'carousel', label: '画像カルーセル' },
+  { id: 'social', label: 'SNSリンク' },
+  { id: 'accordion', label: 'アコーディオン' },
+  { id: 'tabs', label: 'タブメニュー' },
+];
+---
+<SiteLayout title="汎用ページ" description="自由な用途に使える汎用ページと、再利用できるUIパーツの見本です。" breadcrumbs={[{ label: '汎用ページ' }]}>
+  <header class="page-intro page-shell">
+    <p class="eyebrow">GENERAL PAGE / COMPONENT LIBRARY</p>
+    <h1>汎用ページ</h1>
+    <p>このページは、プロフィール、案内、解説、プロジェクト紹介など、用途を限定せずに使えるページです。下部には共通パーツの使用例をまとめています。</p>
+  </header>
+  <div class="content-layout page-shell">
+    <article class="prose">
+      <Toc items={tocItems} />
+      <h2 id="text-links">テキストリンク</h2>
+      <p>塗りつぶしを避け、細い下線と文字で構成したシンプルなリンクボタンです。</p>
+      <div class="button-row"><LinkButton href="/blog/" label="ブログを見る" /><LinkButton href="https://example.com" label="外部サイト" external /></div>
+
+      <h2 id="image-links">画像付きリンク</h2>
+      <p>画像と短い説明を組み合わせたカード型リンクです。画像は遅延読み込みにしています。</p>
+      <div class="feature-grid feature-grid-two">
+        <ImageLink href="/gallery/" image="images/gallery/sample-01.svg" alt="写真のイメージ" title="Gallery" description="写真をまとめたページ" />
+        <ImageLink href="/blog/" image="images/gallery/sample-02.svg" alt="文章のイメージ" title="Journal" description="日々の記録を読む" />
+      </div>
+
+      <h2 id="carousel">画像カルーセル</h2>
+      <p>CSSのスクロールスナップを使った軽量なカルーセルです。マウス、タッチ、キーボードでも操作できます。</p>
+      <Carousel items={galleryItems} />
+
+      <h2 id="social">SNSリンク</h2>
+      <p>リンク先は <code>src/config/site.ts</code> で管理します。URLが空欄のSNSは自動的に表示されません。</p>
+      <SocialLinks />
+
+      <h2 id="accordion">アコーディオンメニュー</h2>
+      <Accordion items={[
+        { title: 'このサイトについて', content: 'サイトの目的や運営者情報などを掲載する場所です。文章はコンポーネントを呼び出すページ側で変更できます。' },
+        { title: '更新方法', content: 'ブログはMarkdownファイルを追加し、ギャラリーは画像を配置してデータ一覧に追加します。変更をGitHubへ反映すると自動で公開されます。' },
+        { title: 'カスタマイズ', content: '配色・余白・文字サイズなどは src/styles/global.css のCSS変数で一括管理します。' },
+      ]} />
+
+      <h2 id="tabs">タブメニュー</h2>
+      <p>タブはキーボードの左右矢印でも切り替えられます。</p>
+      <Tabs tabs={[
+        { id: 'overview', label: '概要', content: 'タブ内の文章や表示内容を切り替えられます。' },
+        { id: 'details', label: '詳細', content: '長い説明や補足情報を整理して表示する用途に向いています。' },
+        { id: 'notes', label: '備考', content: 'スマートフォンでも横幅を圧迫しすぎないシンプルなタブです。' },
+      ]} />
+    </article>
+    <aside class="page-aside"><p class="eyebrow">PAGE NOTE</p><p>ページ本文はMarkdownまたはAstroコンポーネントで自由に組み立てられます。</p><LinkButton href="/gallery/" label="ギャラリーを見る" /></aside>
+  </div>
+</SiteLayout>

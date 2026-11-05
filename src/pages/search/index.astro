@@ -1,0 +1,11 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+---
+<SiteLayout title="サイト内検索" description="サイト内のページや記事を検索できます。" breadcrumbs={[{ label: '検索' }]}>
+  <section class="page-intro page-shell"><p class="eyebrow">SEARCH</p><h1>サイト内検索</h1><p>キーワードを入力して、サイト内のコンテンツを検索できます。</p></section>
+  <section class="page-shell search-page">
+    <pagefind-input placeholder="キーワードを入力" debounce-time="200"></pagefind-input>
+    <pagefind-summary></pagefind-summary>
+    <pagefind-results></pagefind-results>
+  </section>
+</SiteLayout>
